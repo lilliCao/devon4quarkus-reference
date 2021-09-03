@@ -18,14 +18,20 @@ import com.devonfw.demoquarkus.logic.UcManageAnimal;
 import com.devonfw.demoquarkus.service.v1.model.AnimalDto;
 import com.devonfw.demoquarkus.service.v1.model.AnimalSearchCriteriaDto;
 import com.devonfw.demoquarkus.service.v1.model.NewAnimalDto;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.tkit.quarkus.rs.models.PageResultDTO;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 //In Quarkus all JAX-RS resources are treated as CDI beans
 //default is Singleton scope
@@ -46,16 +52,21 @@ public class AnimalRestService {
     @Inject
     UcManageAnimal ucManageAnimal;
 
-    @APIResponses({
-    @APIResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PagedAnimalResponse.class))),
-    @APIResponse(responseCode = "500")})
-    @Operation(operationId = "Get Animals", description = "Returns list of animals matching given criteria, uses pagination")
     @GET
     // REST service methods should not declare exceptions, any thrown error will be transformed by exceptionMapper in
     // tkit-rest
     // We did not define custom @Path - so it will use class level path
-    public PageImpl<AnimalDto> getAll(@BeanParam AnimalSearchCriteriaDto dto) {
-        return (PageImpl) ucFindAnimal.findAnimals(dto);
+    public Page<AnimalDto> getAll(@BeanParam AnimalSearchCriteriaDto dto) {
+        return ucFindAnimal.findAnimals(dto);
+    }
+
+    @GET
+    @Path("/test")
+    // REST service methods should not declare exceptions, any thrown error will be transformed by exceptionMapper in
+    // tkit-rest
+    // We did not define custom @Path - so it will use class level path
+    public String getTest() {
+        return "I am a test";
     }
 
     @GET
